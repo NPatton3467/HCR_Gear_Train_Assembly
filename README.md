@@ -5,6 +5,9 @@ We will train two skills for the manipulator
 
 ## Pre-Requisite
 - Isaac Lab [https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html]
+- Download custom assets, i.e. the custom robot and the assembly board
+  - https://utexas.box.com/s/burh5f9f1n102pabi0wzztsxd1sbt46o
+  - Save them to `~/Documents/USD/`
 
 ## Setup
 1. Go to the directory `source/isaaclab_tasks/isaaclab_tasks/manager_based`
