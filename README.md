@@ -3,10 +3,16 @@ We will train two skills for the manipulator
 - Peg Insertion
 - Gear Meshing
 
+## Pre-Requisite
+- Isaac Lab [https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html]
+
+## Setup
+1. Go to the directory `source/isaaclab_tasks/isaaclab_tasks/manager_based`
+2. Clone the repository `https://github.com/bugartlan/HCR_Gear_Train_Assembly.git`
+
 ## Hardware
 - UR3e
 - Robotiq Hand-E
-
 
 ## Peg Insertion
 ### Current Progress
@@ -22,4 +28,21 @@ We will train two skills for the manipulator
   - Add contact forces to observations
   - Refine reward functions
   - Define termination for task completion
+
+### Training 
+- **Run training without visualization (headless)**: Use `--num_env 1` for faster startup for quick syntax checks.
+```bash
+python scripts/reinforcement_learning/rsl_rl/train.py --task Isaac-Assembly-PegInsert-v0 --headless
+```
+- **Run training with visualization** for visual debugging.
+
+```bash
+python scripts/reinforcement_learning/rsl_rl/train.py --task Isaac-Assembly-PegInsert-v0 --num_env 1
+```
+
+### Playing a Policy
+- **Export and run the most recent trained policy**:
+```bash
+python scripts/reinforcement_learning/rsl_rl/play.py --task Isaac-Assembly-PegInsert-v0 --num_env 1
+```
 
