@@ -151,8 +151,8 @@ factory_hole_8mm = ArticulationCfg(
 custom_peg = ArticulationCfg(
     prim_path="/World/envs/env_.*/Peg",
     spawn=sim_utils.UsdFileCfg(
-        usd_path=os.path.expanduser("~/Documents/USD/Peg.usd"),
-        activate_contact_sensors=True,
+        usd_path=os.path.expanduser("~/Documents/SLDPRT/Peg.usd"),
+        activate_contact_sensors=False,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=True,
             max_depenetration_velocity=5.0,
@@ -179,7 +179,7 @@ custom_peg = ArticulationCfg(
 custom_hole = ArticulationCfg(
     prim_path="/World/envs/env_.*/Hole",
     spawn=sim_utils.UsdFileCfg(
-        usd_path=os.path.expanduser("~/Documents/USD/Hole2.usd"),
+        usd_path=os.path.expanduser("~/Documents/SLDPRT/Hole.usd"),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -236,15 +236,26 @@ class AssemblySceneCfg(InteractiveSceneCfg):
         ],
     )
 
+    peg_bottom_frame: FrameTransformerCfg = FrameTransformerCfg(
+        prim_path="{ENV_REGEX_NS}/Peg/Peg",
+        debug_vis=True,
+        visualizer_cfg=marker_cfg,
+        target_frames=[
+            FrameTransformerCfg.FrameCfg(
+                prim_path="{ENV_REGEX_NS}/Peg/Peg",
+                name="peg_bottom",
+                offset=OffsetCfg(
+                    pos=[0.0, 0.0, 0.036],
+                ),
+            ),
+        ],
+    )
+
     # peg
-    # tensor([[0.2986, 0.1124, 0.2136]], device='cuda:0')
     peg: ArticulationCfg = custom_peg.replace(prim_path="/World/envs/env_.*/Peg")
 
     # hole
     hole: ArticulationCfg = custom_hole.replace(prim_path="/World/envs/env_.*/Hole")
-    # hole: ArticulationCfg = factory_hole_8mm.replace(
-    #     prim_path="/World/envs/env_.*/Hole"
-    # )
 
     # plane
     plane = AssetBaseCfg(
@@ -354,10 +365,12 @@ class RewardsCfg:
     axis_alignment = RewTerm(func=mdp.axis_alignment, weight=1.0)
 
     peg_hole_horizontonal_distance = RewTerm(
-        func=mdp.peg_hole_horizontal_distance, weight=-10.0
+        func=mdp.peg_hole_horizontal_distance, weight=-50.0
     )
 
-    insertion_depth = RewTerm(func=mdp.insertion_depth, weight=1.0)
+    insertion_depth = RewTerm(
+        func=mdp.insertion_depth, weight=2.0, params={"alpha": 200}
+    )
 
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=-1e-4)
 
