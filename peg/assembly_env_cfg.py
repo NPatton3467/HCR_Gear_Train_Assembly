@@ -10,6 +10,7 @@ import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
+from isaaclab.managers import CurriculumTermCfg as CurrTerm
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
@@ -84,8 +85,8 @@ UR3e_ROBOTIQ_GRIPPER_CFG = ArticulationCfg(
         ),
         "gripper": ImplicitActuatorCfg(
             joint_names_expr=["Slider_.*"],
-            stiffness=1e5,
-            damping=2e3,
+            stiffness=1e6,
+            damping=2e4,
             friction=0.0,
             armature=0.0,
         ),
@@ -151,8 +152,8 @@ factory_hole_8mm = ArticulationCfg(
 custom_peg = ArticulationCfg(
     prim_path="/World/envs/env_.*/Peg",
     spawn=sim_utils.UsdFileCfg(
-        usd_path=os.path.expanduser("~/Documents/SLDPRT/Peg.usd"),
-        activate_contact_sensors=False,
+        usd_path=os.path.expanduser("~/Documents/USD/Peg.usd"),
+        activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=True,
             max_depenetration_velocity=5.0,
@@ -179,7 +180,7 @@ custom_peg = ArticulationCfg(
 custom_hole = ArticulationCfg(
     prim_path="/World/envs/env_.*/Hole",
     spawn=sim_utils.UsdFileCfg(
-        usd_path=os.path.expanduser("~/Documents/SLDPRT/Hole.usd"),
+        usd_path=os.path.expanduser("~/Documents/USD/Hole.usd"),
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -365,11 +366,17 @@ class RewardsCfg:
     axis_alignment = RewTerm(func=mdp.axis_alignment, weight=1.0)
 
     peg_hole_horizontonal_distance = RewTerm(
-        func=mdp.peg_hole_horizontal_distance, weight=-50.0
+        func=mdp.peg_hole_horizontal_distance, weight=-100.0
     )
 
     insertion_depth = RewTerm(
-        func=mdp.insertion_depth, weight=2.0, params={"alpha": 200}
+        func=mdp.insertion_depth,
+        weight=2.0,
+        params={
+            "location_threshold": 0.005,
+            "orientation_threshold": 0.97,
+            "alpha": 10,
+        },
     )
 
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=-1e-4)
@@ -392,6 +399,21 @@ class TerminationsCfg:
     # TODO: terminate when peg is inserted into hole
 
 
+@configclass
+class CurriculumCfg:
+    """Curriculum terms for the MDP."""
+
+    action_rate = CurrTerm(
+        func=mdp.modify_reward_weight,
+        params={"term_name": "action_rate", "weight": -1e-1, "num_steps": 10000},
+    )
+
+    joint_vel = CurrTerm(
+        func=mdp.modify_reward_weight,
+        params={"term_name": "joint_vel", "weight": -1e-1, "num_steps": 10000},
+    )
+
+
 ##
 # Environment configuration
 ##
@@ -408,6 +430,7 @@ class AssemblyEnvCfg(ManagerBasedRLEnvCfg):
     # MDP settings
     rewards: RewardsCfg = RewardsCfg()
     terminations: TerminationsCfg = TerminationsCfg()
+    curriculum: CurriculumCfg = CurriculumCfg()
 
     # Post initialization
     def __post_init__(self) -> None:
@@ -426,7 +449,7 @@ class AssemblyEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.physx.bounce_threshold_velocity = 0.2
         self.sim.physx.gpu_max_rigid_contact_count = 2**23
         self.sim.physx.gpu_max_rigid_patch_count = 2**23
-        self.sim.physx.gpu_collision_stack_size = 2**28
+        self.sim.physx.gpu_collision_stack_size = 2**30
         self.sim.physx.gpu_max_num_partitions = 1
         self.sim.physx.friction_offset_threshold = 0.01
         self.sim.physx.friction_correlation_distance = 0.00625

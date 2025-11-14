@@ -26,11 +26,11 @@ We will train two skills for the manipulator
 ### TODOs
 - Configure the parameters for the assets, e.g. peg and hole
   - Dimensions of the assets
-  - Check if collision is working properly
 - Complete MDP implementation and tune rewards
   - Add contact forces to observations
   - Refine reward functions
   - Define termination for task completion
+- Resolve potential interference between the fingers and the gears
 
 ### Training 
 - **Run training without visualization (headless)**: Use `--num_env 1` for faster startup for quick syntax checks.

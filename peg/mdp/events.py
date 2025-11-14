@@ -42,6 +42,8 @@ def reset_joints_selected(
 def reset_peg_in_hand(
     env: ManagerBasedRLEnv,
     env_ids: torch.Tensor,
+    tf_pos: list = [0.0, 0.0, 0.0],
+    tf_quat: list = [0.7071, 0.0, 0.0, 0.7071],
     peg_cfg: SceneEntityCfg = SceneEntityCfg("peg"),
     ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame"),
     robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
@@ -62,11 +64,15 @@ def reset_peg_in_hand(
     ee_frame.update(dt=0, force_recompute=True)
 
     root = peg.data.default_root_state.clone()
-    root[:, :3] = ee_frame.data.target_pos_w[..., 0, :]
-    q_rot_z_90 = torch.tensor(
-        [0.7071, 0.0, 0.0, 0.7071], device=root.device
-    ).broadcast_to(ee_frame.data.target_quat_w[..., 0, :].shape)
-    root[:, 3:7] = quat_mul(ee_frame.data.target_quat_w[..., 0, :], q_rot_z_90)
+    root[:, :3] = ee_frame.data.target_pos_w[..., 0, :] + torch.tensor(
+        tf_pos, device=root.device
+    ).broadcast_to(ee_frame.data.target_pos_w[..., 0, :].shape)
+    root[:, 3:7] = quat_mul(
+        ee_frame.data.target_quat_w[..., 0, :],
+        torch.tensor(tf_quat, device=root.device).broadcast_to(
+            ee_frame.data.target_quat_w[..., 0, :].shape
+        ),
+    )
     root[:, 7:] = 0.0  # zero velocity
 
     peg.write_root_state_to_sim(root[env_ids], env_ids=env_ids)

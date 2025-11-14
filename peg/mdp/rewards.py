@@ -75,7 +75,7 @@ def peg_hole_horizontal_distance(
 def insertion_depth(
     env: ManagerBasedRLEnv,
     location_threshold: float = 0.01,
-    orientation_threshold: float = 0.85,
+    orientation_threshold: float = 0.8,
     alpha: float = 50,
     peg_bottom_frame_cfg: SceneEntityCfg = SceneEntityCfg("peg_bottom_frame"),
     hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
@@ -95,16 +95,18 @@ def insertion_depth(
     hole_pos_w = hole.data.root_pos_w
 
     is_within_location_threshold = (
-        torch.norm(peg_bottom_pos_w[..., :2] - hole_pos_w[:, :2], dim=1)
+        torch.norm(peg_bottom_pos_w[:, :2] - hole_pos_w[:, :2], dim=1)
         < location_threshold
     ).to(torch.float32)
-
     is_within_orientation_threshold = (
         torch.abs(torch.cosine_similarity(peg_bottom_z_w, hole_z_w, dim=1))
         > orientation_threshold
     ).to(torch.float32)
-    return (
+
+    reward = (
         is_within_location_threshold
         * is_within_orientation_threshold
         * torch.exp((hole_pos_w[:, 2] - peg_bottom_pos_w[..., 2]) * alpha)
     )
+    # print(reward)
+    return reward
