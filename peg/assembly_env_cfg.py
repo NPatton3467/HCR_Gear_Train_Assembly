@@ -3,11 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import math
-import os
-
 import isaaclab.sim as sim_utils
-from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import CurriculumTermCfg as CurrTerm
@@ -23,188 +19,14 @@ from isaaclab.sensors import FrameTransformerCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
 from isaaclab.utils import configclass
-from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 
 from . import mdp
+from .assets import UR3e_ROBOTIQ_GRIPPER_CFG, custom_hole, custom_peg
 
 ##
 # Scene definition
 ##
-
-ASSET_DIR = f"{ISAACLAB_NUCLEUS_DIR}/Factory"
-
-UR3e_ROBOTIQ_GRIPPER_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        usd_path=os.path.expanduser("~/Documents/USD/HCR_ClassRobot.usd"),
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=True,
-            max_depenetration_velocity=5.0,
-        ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False,
-            solver_position_iteration_count=16,
-            solver_velocity_iteration_count=1,
-        ),
-        activate_contact_sensors=False,
-    ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        joint_pos={
-            "shoulder_pan_joint": 0,
-            "shoulder_lift_joint": -math.pi / 2,
-            "elbow_joint": math.pi / 2,
-            "wrist_1_joint": -math.pi / 2,
-            "wrist_2_joint": -math.pi / 2,
-            "wrist_3_joint": 0.0,
-            "Slider_.*": 0.0,
-        },
-        pos=(0.0, 0.0, 0.0),
-        rot=(1.0, 0.0, 0.0, 0.0),
-    ),
-    actuators={
-        # 'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'
-        "shoulder": ImplicitActuatorCfg(
-            joint_names_expr=["shoulder_.*"],
-            stiffness=330.0,
-            damping=36.0,
-            friction=0.0,
-            armature=0.0,
-        ),
-        "elbow": ImplicitActuatorCfg(
-            joint_names_expr=["elbow_joint"],
-            stiffness=150.0,
-            damping=17.5,
-            friction=0.0,
-            armature=0.0,
-        ),
-        "wrist": ImplicitActuatorCfg(
-            joint_names_expr=["wrist_.*"],
-            stiffness=54.0,
-            damping=14.5,
-            friction=0.0,
-            armature=0.0,
-        ),
-        "gripper": ImplicitActuatorCfg(
-            joint_names_expr=["Slider_.*"],
-            stiffness=1e6,
-            damping=2e4,
-            friction=0.0,
-            armature=0.0,
-        ),
-    },
-)
-
-factory_peg_8mm = ArticulationCfg(
-    prim_path="/World/envs/env_.*/Peg",
-    spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ASSET_DIR}/factory_peg_8mm.usd",
-        activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=True,
-            max_depenetration_velocity=5.0,
-            linear_damping=0.0,
-            angular_damping=0.0,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=3666.0,
-            enable_gyroscopic_forces=True,
-            solver_position_iteration_count=192,
-            solver_velocity_iteration_count=1,
-            max_contact_impulse=1e32,
-        ),
-        mass_props=sim_utils.MassPropertiesCfg(mass=0.1),
-        collision_props=sim_utils.CollisionPropertiesCfg(
-            contact_offset=0.005, rest_offset=0.0
-        ),
-    ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.2, 0.2, 0.1), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    ),
-    actuators={},
-)
-
-factory_hole_8mm = ArticulationCfg(
-    prim_path="/World/envs/env_.*/Hole",
-    spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ASSET_DIR}/factory_hole_8mm.usd",
-        activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=False,
-            max_depenetration_velocity=5.0,
-            linear_damping=0.0,
-            angular_damping=0.0,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=3666.0,
-            enable_gyroscopic_forces=True,
-            solver_position_iteration_count=192,
-            solver_velocity_iteration_count=1,
-            max_contact_impulse=1e32,
-        ),
-        mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
-        collision_props=sim_utils.CollisionPropertiesCfg(
-            contact_offset=0.005, rest_offset=0.0
-        ),
-    ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.3, 0.0, 0.0), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    ),
-    actuators={},
-)
-
-custom_peg = ArticulationCfg(
-    prim_path="/World/envs/env_.*/Peg",
-    spawn=sim_utils.UsdFileCfg(
-        usd_path=os.path.expanduser("~/Documents/USD/Peg.usd"),
-        activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=True,
-            max_depenetration_velocity=5.0,
-            linear_damping=0.0,
-            angular_damping=0.0,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=3666.0,
-            enable_gyroscopic_forces=True,
-            solver_position_iteration_count=192,
-            solver_velocity_iteration_count=1,
-            max_contact_impulse=1e32,
-        ),
-        mass_props=sim_utils.MassPropertiesCfg(mass=0.1),
-        collision_props=sim_utils.CollisionPropertiesCfg(
-            contact_offset=0.005, rest_offset=0.0
-        ),
-    ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.2, 0.2, 0.1), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    ),
-    actuators={},
-)
-
-custom_hole = ArticulationCfg(
-    prim_path="/World/envs/env_.*/Hole",
-    spawn=sim_utils.UsdFileCfg(
-        usd_path=os.path.expanduser("~/Documents/USD/Hole.usd"),
-        activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=False,
-            max_depenetration_velocity=5.0,
-            linear_damping=0.0,
-            angular_damping=0.0,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=3666.0,
-            enable_gyroscopic_forces=True,
-            solver_position_iteration_count=192,
-            solver_velocity_iteration_count=1,
-            max_contact_impulse=1e32,
-        ),
-        mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
-        collision_props=sim_utils.CollisionPropertiesCfg(
-            contact_offset=0.005, rest_offset=0.0
-        ),
-    ),
-    # TODO (Benito): height of the hole goes here
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.3, 0.0, 0.015), rot=(0.0, 1.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    ),
-    actuators={},
-)
 
 marker_cfg = FRAME_MARKER_CFG.copy()
 marker_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
@@ -289,6 +111,13 @@ class AssemblySceneCfg(InteractiveSceneCfg):
 
 
 @configclass
+class CommandsCfg:
+    """Command specifications for the MDP."""
+
+    pass
+
+
+@configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
 
@@ -328,6 +157,8 @@ class ObservationsCfg:
     # observation groups
     policy: PolicyCfg = PolicyCfg()
 
+    critic: PolicyCfg = PolicyCfg()
+
 
 @configclass
 class EventCfg:
@@ -348,35 +179,41 @@ class EventCfg:
         },
     )
 
-    # reset_hole = EventTerm(
-    #     func=mdp.reset_root_state_uniform,
-    #     mode="reset",
-    #     params={
-    #         "pose_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1), "z": (0.0, 0.0)},
-    #         "velocity_range": {},
-    #         "asset_cfg": SceneEntityCfg("hole", body_names="Hole"),
-    #     },
-    # )
+    reset_hole = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {"x": (0.0, 0.0), "y": (0.0, 0.0), "z": (0.0, 0.0)},
+            "velocity_range": {},
+            "asset_cfg": SceneEntityCfg("hole", body_names="Hole"),
+        },
+    )
 
 
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    axis_alignment = RewTerm(func=mdp.axis_alignment, weight=1.0)
+    peg_orientation_tracking = RewTerm(func=mdp.orientation_error, weight=1.0)
 
-    peg_hole_horizontonal_distance = RewTerm(
-        func=mdp.peg_hole_horizontal_distance, weight=-100.0
+    peg_position_xy_tracking = RewTerm(
+        func=mdp.position_xy_error, weight=1.0, params={"std": 0.25, "kernel": "exp"}
     )
 
-    insertion_depth = RewTerm(
-        func=mdp.insertion_depth,
-        weight=2.0,
-        params={
-            "location_threshold": 0.005,
-            "orientation_threshold": 0.97,
-            "alpha": 10,
-        },
+    peg_position_xy_tracking_fine_grained = RewTerm(
+        func=mdp.position_xy_error, weight=2.0, params={"std": 0.1, "kernel": "tanh"}
+    )
+
+    peg_position_z_tracking = RewTerm(
+        func=mdp.position_z_error,
+        weight=3.0,
+        params={"std_xy": 0.1, "std_z": 0.2, "std_rz": 0.5, "kernel": "exp"},
+    )
+
+    peg_position_z_tracking_fine_grained = RewTerm(
+        func=mdp.position_z_error,
+        weight=4.0,
+        params={"std_xy": 0.1, "std_z": 0.1, "std_rz": 0.5, "kernel": "tanh"},
     )
 
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=-1e-4)
@@ -426,6 +263,7 @@ class AssemblyEnvCfg(ManagerBasedRLEnvCfg):
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()
+    commands: CommandsCfg = CommandsCfg()
     events: EventCfg = EventCfg()
     # MDP settings
     rewards: RewardsCfg = RewardsCfg()

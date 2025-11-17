@@ -18,26 +18,63 @@ if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedRLEnv
 
 
-def hole_ee_distance(
+def position_xy_error(
     env: ManagerBasedRLEnv,
     std: float,
+    kernel: str = "exp",
+    peg_cfg: SceneEntityCfg = SceneEntityCfg("peg_bottom_frame"),
     hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
-    ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame"),
 ) -> torch.Tensor:
-    """Reward the agent for reaching the object using tanh-kernel."""
+    """Reward the agent for reaching the object using exp-kernel."""
+    peg: FrameTransformer = env.scene[peg_cfg.name]
     hole: RigidObject = env.scene[hole_cfg.name]
-    ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
-    # Target object position: (num_envs, 3)
+
     hole_pos_w = hole.data.root_pos_w
-    # End-effector position: (num_envs, 3)
-    ee_w = ee_frame.data.target_pos_w[..., 0, :]
-    # Distance of the end-effector to the object: (num_envs,)
-    hole_ee_distance = torch.norm(hole_pos_w - ee_w, dim=1)
+    peg_w = peg.data.target_pos_w[:, 0, :]
+    error = torch.norm(hole_pos_w[:, :2] - peg_w[:, :2], dim=1)
 
-    return 1 - torch.tanh(hole_ee_distance / std)
+    if kernel == "tanh":
+        return 1 - torch.tanh(error / std**2)
+    elif kernel == "exp":
+        return torch.exp(-error / std**2)
+    else:
+        return F.relu(1 - error / std**2)
 
 
-def axis_alignment(
+def position_z_error(
+    env: ManagerBasedRLEnv,
+    std_xy: float = 1.0,
+    std_z: float = 1.0,
+    std_rz: float = 1.0,
+    kernel: str = "exp",
+    peg_cfg: SceneEntityCfg = SceneEntityCfg("peg_bottom_frame"),
+    hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
+) -> torch.Tensor:
+    """Reward the agent for reaching the object using exp-kernel."""
+    peg: FrameTransformer = env.scene[peg_cfg.name]
+    hole: RigidObject = env.scene[hole_cfg.name]
+
+    hole_pos_w = hole.data.root_pos_w
+    peg_pos_w = peg.data.target_pos_w[:, 0, :]
+    xy_error = torch.norm(hole_pos_w[:, :2] - peg_pos_w[:, :2], dim=1)
+    z_error = hole_pos_w[:, 2] - peg_pos_w[:, 2]
+
+    peg_rz_w = matrix_from_quat(peg.data.target_quat_w[:, 0, :])[:, :, 2]
+    hole_rz_w = matrix_from_quat(hole.data.root_quat_w)[:, :, 2]
+    alignment_error = 1 - torch.cosine_similarity(peg_rz_w, hole_rz_w, dim=1).pow(2)
+
+    if kernel == "tanh":
+        reward = 1 - torch.tanh(z_error / std_z**2)
+    else:
+        reward = torch.exp(-z_error / std_z**2)
+    return (
+        torch.exp(-xy_error / std_xy**2)
+        * torch.exp(-alignment_error / std_rz**2)
+        * reward
+    )
+
+
+def orientation_error(
     env: ManagerBasedRLEnv,
     peg_cfg: SceneEntityCfg = SceneEntityCfg("peg"),
     hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
@@ -50,7 +87,7 @@ def axis_alignment(
     # Hole z-axis in world frame: (num_envs, 3)
     hole_z_w = matrix_from_quat(hole.data.root_quat_w)[:, :, 2]
 
-    return torch.abs(torch.cosine_similarity(peg_z_w, hole_z_w, dim=1))
+    return torch.cosine_similarity(peg_z_w, hole_z_w, dim=1).pow(2)
 
 
 def peg_hole_horizontal_distance(
@@ -102,6 +139,8 @@ def insertion_depth(
         torch.abs(torch.cosine_similarity(peg_bottom_z_w, hole_z_w, dim=1))
         > orientation_threshold
     ).to(torch.float32)
+
+    # print((hole_pos_w[:, 2] - peg_bottom_pos_w[..., 2]))
 
     reward = (
         is_within_location_threshold

@@ -3,9 +3,13 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+import os
+
 import gymnasium as gym
 
 from . import agents
+
+TASK_DIR = os.path.dirname(__file__)
 
 ##
 # Register Gym environments.
