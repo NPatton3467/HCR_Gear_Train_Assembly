@@ -15,7 +15,6 @@ class ChamferedPegInsertEnvCfg(AssemblyEnvCfg):
         super().__post_init__()
 
         self.scene.peg = custom_peg.replace(prim_path="{ENV_REGEX_NS}/Peg")
-
         self.scene.peg_bottom_frame.target_frames = [
             FrameTransformerCfg.FrameCfg(
                 prim_path="{ENV_REGEX_NS}/Peg/Peg",

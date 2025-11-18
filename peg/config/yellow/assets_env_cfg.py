@@ -48,6 +48,9 @@ class YellowPegInsertEnvCfg(AssemblyEnvCfg):
             },
         )
 
+        self.rewards.peg_orientation_tracking.params["sign"] = -1.0
+        self.rewards.peg_orientation_tracking_fine_grained.params["sign"] = -1.0
+
 
 @configclass
 class YellowPegInsertEnvCfg_PLAY(YellowPegInsertEnvCfg):

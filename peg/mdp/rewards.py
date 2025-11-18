@@ -104,6 +104,7 @@ def position_z_error(
 def orientation_error(
     env: ManagerBasedRLEnv,
     std: float = 1.0,
+    sign: float = 1.0,
     kernel: str = "exp",
     peg_cfg: SceneEntityCfg = SceneEntityCfg("peg"),
     hole_cfg: SceneEntityCfg = SceneEntityCfg("hole"),
@@ -116,7 +117,7 @@ def orientation_error(
     # Hole z-axis in world frame: (num_envs, 3)
     hole_z_w = matrix_from_quat(hole.data.root_quat_w)[:, :, 2]
 
-    cos_error = -torch.cosine_similarity(peg_z_w, hole_z_w, dim=1)
+    cos_error = sign * torch.cosine_similarity(peg_z_w, hole_z_w, dim=1)
     # print("cos error:", cos_error)
     rad_error = torch.acos(cos_error)
     # print("rad error:", rad_error)
