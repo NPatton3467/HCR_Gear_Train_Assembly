@@ -16,7 +16,7 @@ from . import agents
 ##
 
 gym.register(
-    id="Isaac-Assembly-PegInsert-Chamfered-v0",
+    id="Isaac-Assembly-PegInsert-Chamfer-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -27,7 +27,7 @@ gym.register(
 )
 
 gym.register(
-    id="Isaac-Assembly-PegInsert-Chamfered-Play-v0",
+    id="Isaac-Assembly-PegInsert-Chamfer-Play-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -41,7 +41,7 @@ gym.register(
 # IK Absolute Pose Control
 ##
 gym.register(
-    id="Isaac-Assembly-PegInsert-Chamfered-v0",
+    id="Isaac-Assembly-PegInsert-Chamfer-IK-Abs-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -51,7 +51,7 @@ gym.register(
 )
 
 gym.register(
-    id="Isaac-Assembly-PegInsert-Chamfered-Play-v0",
+    id="Isaac-Assembly-PegInsert-Chamfer-IK-Abs-Play-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={

@@ -8,7 +8,7 @@ from .. import TASK_DIR
 
 UR3e_ROBOTIQ_GRIPPER_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{TASK_DIR}/assets/USD/HCR_ClassRobot.usd",
+        usd_path=f"{TASK_DIR}/assets/USD/ur3e.usd",
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=True,
             max_depenetration_velocity=5.0,
@@ -66,4 +66,6 @@ UR3e_ROBOTIQ_GRIPPER_CFG = ArticulationCfg(
     },
 )
 
-ROBOTIQ_GRIPPER_CENTER_OFFSET = 0.13  # Offset from gripper base to gripper center along gripper approach axis
+ROBOTIQ_GRIPPER_CENTER_OFFSET = (
+    0.13  # Offset from gripper base to gripper center along gripper approach axis
+)
