@@ -42,8 +42,6 @@ marker_cfg.prim_path = "/Visuals/FrameTransformer"
 class AssemblySceneCfg(InteractiveSceneCfg):
     """Configuration for a cart-pole scene."""
 
-    # TODO: find a better place to store the hardcoded parameters
-
     # robot
     robot: ArticulationCfg = UR3e_ROBOTIQ_GRIPPER_CFG.replace(
         prim_path="{ENV_REGEX_NS}/Robot"
@@ -114,19 +112,7 @@ class CommandsCfg:
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    arm_action = mdp.JointPositionActionCfg(
-        asset_name="robot",
-        joint_names=[
-            "shoulder_pan_joint",
-            "shoulder_lift_joint",
-            "elbow_joint",
-            "wrist_1_joint",
-            "wrist_2_joint",
-            "wrist_3_joint",
-        ],
-        scale=0.5,
-        use_default_offset=True,
-    )
+    arm_action: mdp.JointPositionActionCfg | mdp.DifferentialInverseKinematicsActionCfg = MISSING
 
 
 @configclass
@@ -204,13 +190,13 @@ class RewardsCfg:
     peg_position_z_tracking = RewTerm(
         func=mdp.position_z_error,
         weight=4.0,
-        params={"std_xy": 0.1, "std_z": 0.2, "std_rz": 0.25, "kernel": "exp"},
+        params={"std_xy": 0.25, "std_z": 0.2, "std_rz": 1.0, "kernel": "exp"},
     )
 
     peg_position_z_tracking_fine_grained = RewTerm(
         func=mdp.position_z_error,
         weight=10.0,
-        params={"std_xy": 0.1, "std_z": 0.1, "std_rz": 0.25, "kernel": "tanh"},
+        params={"std_xy": 0.1, "std_z": 0.1, "std_rz": 0.5, "kernel": "tanh"},
     )
 
     task_success_bonus = RewTerm(

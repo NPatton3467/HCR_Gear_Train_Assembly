@@ -4,12 +4,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 from isaaclab.utils import configclass
-from isaaclab_rl.rsl_rl import (
-    RslRlOnPolicyRunnerCfg,
-    RslRlPpoActorCriticCfg,
-    RslRlPpoActorCriticRecurrentCfg,
-    RslRlPpoAlgorithmCfg,
-)
+from isaaclab_rl.rsl_rl import (RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg,
+                                RslRlPpoActorCriticRecurrentCfg,
+                                RslRlPpoAlgorithmCfg)
 
 
 @configclass
@@ -31,7 +28,7 @@ class PegInsertPPORunnerCfg(RslRlOnPolicyRunnerCfg):
         actor_obs_normalization=True,
         critic_obs_normalization=True,
         actor_hidden_dims=[512, 256, 128],
-        critic_hidden_dims=[512, 256, 128],
+        critic_hidden_dims=[256, 128, 64],
         activation="elu",
     )
     algorithm = RslRlPpoAlgorithmCfg(
@@ -41,9 +38,9 @@ class PegInsertPPORunnerCfg(RslRlOnPolicyRunnerCfg):
         entropy_coef=0.0,
         num_learning_epochs=4,
         num_mini_batches=32,
-        learning_rate=1.0e-4,
+        learning_rate=1.0e-3,
         schedule="adaptive",
-        gamma=0.995,
+        gamma=0.998,
         lam=0.95,
         desired_kl=0.008,
         max_grad_norm=1.0,

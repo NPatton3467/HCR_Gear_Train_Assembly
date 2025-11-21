@@ -1,5 +1,7 @@
-from isaaclab.controllers.differential_ik_cfg import DifferentialIKControllerCfg
-from isaaclab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsActionCfg
+from isaaclab.controllers.differential_ik_cfg import \
+    DifferentialIKControllerCfg
+from isaaclab.envs.mdp.actions.actions_cfg import \
+    DifferentialInverseKinematicsActionCfg
 from isaaclab.utils import configclass
 
 from ...assets import ROBOTIQ_GRIPPER_CENTER_OFFSET
@@ -10,6 +12,8 @@ from . import joint_env_cfg
 class ChamferedPegInsertEnvCfg(joint_env_cfg.ChamferedPegInsertEnvCfg):
     def __post_init__(self):
         super().__post_init__()
+
+        # TODO: Configure the robot to be extremely stiff
 
         self.actions.arm_action = DifferentialInverseKinematicsActionCfg(
             asset_name="robot",
