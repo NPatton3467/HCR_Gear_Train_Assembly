@@ -1,21 +1,26 @@
 # File containing environment variables (e.g. W&B credentials)
 # e.g. /path/to/so101_isaac/scripts/local_ray/.env.ray
-env_file: "/home/yl43338-admin/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/assembly/peg/scripts/local_ray/.env.ray"
+#env_file: "/home/yl43338-admin/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/assembly/peg/scripts/local_ray/.env.ray"
+env_file: "/home/vboxuser/ASE389_HWs/Project/HCR_Gear_Train_Assembly/peg/scripts/local_ray/.env.ray"
 # UT EID (for tracking ownership of Ray jobs)
-user_id: yl43338
+user_id: ntp546
 # Working directory during job, should contain your scripts
 # e.g. /path/to/so101_isaac/scripts
-ext_dir: "/home/yl43338-admin/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/assembly/peg/scripts"
+#ext_dir: "/home/yl43338-admin/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/assembly/peg/scripts"
+ext_dir: "/home/vboxuser/ASE389_HWs/Project/HCR_Gear_Train_Assembly/peg/scripts"
 # Train script to execute on cluster
-python_script: "/workspace/isaaclab/source/isaaclab_tasks/isaaclab_tasks/manager_based/geartrain/scripts/train.py"
+python_script: "/workspace/isaaclab/source/isaaclab_tasks/isaaclab_tasks/manager_based/peg/scripts/train.py"
 # Additional dependencies to mount at runtime (will also auto-install module dependencies if setup.py is present at root level)
 # Base environment on cluster only has the barebones Isaac Lab installation, so you will need to add custom extensions,
 #   like so101_isaac, robot_rl, etc.
 file_mounts: {
   # e.g. "/path/to/so101_isaac": "/workspace/isaaclab/source/isaaclab_tasks/isaaclab_tasks/manager_based/so101_isaac"
   #      "/path/to/robot_rl": "/workspace/isaaclab/source/robot_rl"
-  "/home/yl43338-admin/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/assembly/peg": "/workspace/isaaclab/source/isaaclab_tasks/isaaclab_tasks/manager_based/geartrain",
-  "/home/yl43338-admin/robot_rl": "/workspace/isaaclab/source/robot_rl"
+  #"/home/yl43338-admin/IsaacLab/source/isaaclab_tasks/isaaclab_tasks/manager_based/assembly/peg": "/workspace/isaaclab/source/isaaclab_tasks/isaaclab_tasks/manager_based/geartrain",
+  #"/home/yl43338-admin/robot_rl": "/workspace/isaaclab/source/robot_rl"
+  
+  "/home/vboxuser/ASE389_HWs/Project/HCR_Gear_Train_Assembly/peg": "/workspace/isaaclab/source/isaaclab_tasks/isaaclab_tasks/manager_based/peg",
+  "/home/vboxuser/ASE389_HWs/HW4/robot_rl": "/workspace/isaaclab/source/robot_rl"
 }
 # Commands to execute after mounting runtime dependencies but before installation
 run_start_commands: []

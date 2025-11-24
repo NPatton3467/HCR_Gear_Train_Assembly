@@ -23,6 +23,10 @@ class ChamferedPegInsertEnvCfg(AssemblyEnvCfg):
         # self.scene.robot.init_state.pos = (0.8, 0.0, 0.0)
         # self.scene.robot.init_state.rot = (0.0, 0.0, 0.0, 1.0)
         # self.scene.hole.init_state.pos = (0.5, 0.0, self.hole.height)
+        
+        self.viewer = ViewerCfg(
+            eye=(1.0, -0.2, 0.4), origin_type="asset_root", asset_name="robot"
+        )
 
         self.scene.hole = custom_hole.replace(prim_path="/World/envs/env_.*/Hole")
         self.scene.hole.init_state.pos = (0.3, 0.0, self.hole.height)

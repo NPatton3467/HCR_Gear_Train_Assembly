@@ -7,9 +7,14 @@ import gymnasium as gym
 
 from . import agents
 
+from .joint_env_cfg import ChamferedPegInsertEnvCfg
+
+__all__ = ["ChamferedPegInsertEnvCfg"]
 ##
 # Register Gym environments.
 ##
+
+
 
 ##
 # Joint Position Control
