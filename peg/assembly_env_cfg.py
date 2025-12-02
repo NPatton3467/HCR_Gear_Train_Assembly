@@ -172,7 +172,7 @@ class EventCfg:
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
-            "pose_range": {"x": (0.0, 0.0), "y": (0.0, 0.0), "z": (0.0, 0.0)},
+            "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "z": (0.0, 0.0)},
             "velocity_range": {},
             "asset_cfg": SceneEntityCfg("hole", body_names="Hole"),
         },
@@ -184,34 +184,34 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     peg_orientation_tracking = RewTerm(
-        func=mdp.orientation_error, weight=1.0, params={"std": 1.0, "kernel": "tanh"}
+        func=mdp.orientation_error, weight=3.0, params={"std": 1.0, "kernel": "tanh"}
     )
 
     peg_orientation_tracking_fine_grained = RewTerm(
-        func=mdp.orientation_error, weight=2.0, params={"std": 0.5, "kernel": "tanh"}
+        func=mdp.orientation_error, weight=5.0, params={"std": 0.5, "kernel": "tanh"}
     )
 
     peg_position_xy_tracking = RewTerm(
-        func=mdp.position_xy_error, weight=1.0, params={"std": 0.1, "kernel": "exp"}
+        func=mdp.position_xy_error, weight=5.0, params={"std": 0.1, "kernel": "exp"}
     )
 
     peg_position_xy_tracking_fine_grained = RewTerm(
-        func=mdp.position_xy_error, weight=1.5, params={"std": 0.05, "kernel": "tanh"}
+        func=mdp.position_xy_error, weight=6.0, params={"std": 0.05, "kernel": "tanh"}
     )
 
     peg_position_xy_tracking_super_fine_grained = RewTerm(
-        func=mdp.position_xy_error, weight=2.0, params={"std": 0.008, "kernel": "tanh"}
+        func=mdp.position_xy_error, weight=8.0, params={"std": 0.008, "kernel": "tanh"}
     )
 
     peg_position_z_tracking = RewTerm(
         func=mdp.position_z_error,
-        weight=4.0,
+        weight=20.0,
         params={"std_xy": 0.05, "std_z": 0.2, "std_rz": 1.0, "kernel": "exp"},
     )
 
     peg_position_z_tracking_fine_grained = RewTerm(
         func=mdp.position_z_error,
-        weight=10.0,
+        weight=35.0,
         params={"std_xy": 0.008, "std_z": 0.1, "std_rz": 1.0, "kernel": "tanh"},
     )
 

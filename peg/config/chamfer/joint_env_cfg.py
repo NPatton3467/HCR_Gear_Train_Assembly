@@ -70,8 +70,8 @@ class ChamferedPegInsertEnvCfg(AssemblyEnvCfg):
             "tf_quat": [0.707, 0.0, 0.0, 0.707],
         }
         self.events.reset_hole.params["pose_range"] = {
-            "x": (-0.0, 0.0),
-            "y": (-0.0, 0.0),
+            "x": (-0.1, 0.1),
+            "y": (-0.1, 0.1),
             "z": (0.0, 0.0),
         }
 
